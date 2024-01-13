@@ -34,8 +34,9 @@ public class HashVisualisation : MonoBehaviour
             //int v = (int)floor(p.z * 32f / 4f);
             int u = (int)floor(p.x);
             int v = (int)floor(p.z);
+            int w = (int)floor(p.z);
 
-            hashes[i] = hash.Eat(u).Eat(v);
+            hashes[i] = hash.Eat(u).Eat(v).Eat(w);
         }
     }
 
