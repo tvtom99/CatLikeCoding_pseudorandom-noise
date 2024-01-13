@@ -20,11 +20,20 @@ public class HashVisualisation : MonoBehaviour
 
         public SmallXXHash hash;
 
+        public float3x4 domainTRS;
+
         public void Execute(int i)
         {
-            int v = (int)floor(invResolution * i + 0.00001f);
-            int u = i - resolution * v - resolution / 2;
-            v -= resolution / 2;
+            float vf = floor(invResolution * i + 0.00001f);
+            float uf = invResolution * (i - resolution * vf + 0.5f) - 0.5f;
+            vf = invResolution * (vf + 0.5f) - 0.5f;
+
+            float3 p = mul(domainTRS, float4(uf, 0f, vf, 1f));
+
+            //int u = (int)floor(p.x * 32f / 4f);
+            //int v = (int)floor(p.z * 32f / 4f);
+            int u = (int)floor(p.x);
+            int v = (int)floor(p.z);
 
             hashes[i] = hash.Eat(u).Eat(v);
         }
@@ -86,6 +95,9 @@ public class HashVisualisation : MonoBehaviour
     [SerializeField, Range(-2f, 2f)]
     float verticalOffset = 1f;
 
+    [SerializeField]
+    SpaceTRS domain = new SpaceTRS { scale = 8f };
+
     NativeArray<uint> hashes;
 
     ComputeBuffer hashesBuffer;
@@ -103,7 +115,8 @@ public class HashVisualisation : MonoBehaviour
             hashes = hashes,
             resolution = resolution,
             invResolution = 1f / resolution,
-            hash = SmallXXHash.Seed(seed)
+            hash = SmallXXHash.Seed(seed),
+            domainTRS = domain.Matrix
         }.ScheduleParallel(hashes.Length, resolution, default).Complete();
 
         hashesBuffer.SetData(hashes);
