@@ -14,7 +14,9 @@ void ConfigureProcedural()
             1.0
         );
 
-        unity_ObjectToWorld._m13 += _Config.z * ((1.0 / 255.0) * (_Hashes[unity_InstanceID] >> 24 ) - 0.5);
+        unity_ObjectToWorld._m13 
+            += _Config.z * ((1.0 / 255.0) * (_Hashes[unity_InstanceID] >> 24 ) - 0.5);
+        unity_ObjectToWorld._m00_m11_m22 = _Config.y;
     #endif
 }
 
