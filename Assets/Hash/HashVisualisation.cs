@@ -100,26 +100,17 @@ public class HashVisualisation : MonoBehaviour
 
     MaterialPropertyBlock propertyBlock;
 
+    bool isDirty;
+
     private void OnEnable()
     {
+        isDirty = true;
+
         int length = resolution * resolution;
         hashes = new NativeArray<uint>(length, Allocator.Persistent);
         positions = new NativeArray<float3>(length, Allocator.Persistent);
         hashesBuffer = new ComputeBuffer(length, 4);
         positionsBuffer = new ComputeBuffer(length, 3 * 4);
-
-        JobHandle handle = Shapes.Job.ScheduleParallel(positions, resolution, transform.localToWorldMatrix, default);
-
-        new HashJob
-        {
-            positions = positions,
-            hashes = hashes,
-            hash = SmallXXHash.Seed(seed),
-            domainTRS = domain.Matrix
-        }.ScheduleParallel(hashes.Length, resolution, handle).Complete();
-
-        hashesBuffer.SetData(hashes);
-        positionsBuffer.SetData(positions); 
 
         propertyBlock ??= new MaterialPropertyBlock();
         propertyBlock.SetBuffer(hashesId, hashesBuffer);
@@ -148,6 +139,27 @@ public class HashVisualisation : MonoBehaviour
 
     private void Update()
     {
+        if (isDirty || transform.hasChanged)
+        {
+            isDirty = false;
+            transform.hasChanged = false;
+
+            JobHandle handle = Shapes.Job.ScheduleParallel(
+                positions, resolution, transform.localToWorldMatrix, default
+                );
+
+            new HashJob
+            {
+                positions = positions,
+                hashes = hashes,
+                hash = SmallXXHash.Seed(seed),
+                domainTRS = domain.Matrix
+            }.ScheduleParallel(hashes.Length, resolution, handle).Complete();
+
+            hashesBuffer.SetData(hashes);
+            positionsBuffer.SetData(positions);
+        }
+
         Graphics.DrawMeshInstancedProcedural(
             instanceMesh, 0, material, new Bounds(Vector3.zero, Vector3.one), hashes.Length, propertyBlock
         );
