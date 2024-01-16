@@ -25,7 +25,7 @@ public class HashVisualisation : MonoBehaviour
         {
             float3 p = mul(domainTRS, float4(positions[i], 1f));
             int u = (int)floor(p.x);
-            int v = (int)floor(p.z);
+            int v = (int)floor(p.y);
             int w = (int)floor(p.z);
 
             hashes[i] = hash.Eat(u).Eat(v).Eat(w);
@@ -69,9 +69,46 @@ public class HashVisualisation : MonoBehaviour
         public SmallXXHash Eat(byte data) => RotateLeft(accumulator + data * primeE, 11) * primeA;
     }
 
+    public readonly struct SmallXXHash4
+    {
+        const uint primeB = 0b10000101111010111100101001110111;
+        const uint primeC = 0b11000010101100101010111000111101;
+        const uint primeD = 0b00100111110101001110101100101111;
+        const uint primeE = 0b00010110010101100110011110110001;
+
+        readonly uint4 accumulator;
+
+        public SmallXXHash4(uint4 accumulator)
+        {
+            this.accumulator = accumulator;
+        }
+
+        public static SmallXXHash4 Seed(int4 seed) => (uint4)seed + primeE;
+
+        public static implicit operator SmallXXHash4(uint4 accumulator) => new SmallXXHash4(accumulator);
+
+        public static implicit operator uint4(SmallXXHash4 hash)
+        {
+            uint4 avalanche = hash.accumulator;
+            avalanche ^= avalanche >> 15;
+            avalanche *= primeB;
+            avalanche ^= avalanche >> 13;
+            avalanche *= primeC;
+            avalanche ^= avalanche >> 16;
+            return avalanche;
+        }
+
+        static uint4 RotateLeft(uint4 data, int steps) => (data << steps) | (data >> 32 - steps);
+
+        public SmallXXHash4 Eat(int4 data) => RotateLeft(accumulator + (uint4)data * primeC, 17) * primeD;
+    }
+
+
+
     static int
         hashesId = Shader.PropertyToID("_Hashes"),
         positionsId = Shader.PropertyToID("_Positions"),
+        normalsId = Shader.PropertyToID("_Normals"),
         configId = Shader.PropertyToID("_Config");
 
     [SerializeField]
@@ -86,19 +123,21 @@ public class HashVisualisation : MonoBehaviour
     [SerializeField]
     int seed;
 
-    [SerializeField, Range(-2f, 2f)]
-    float verticalOffset = 1f;
+    [SerializeField, Range(-0.5f, 0.5f)]
+    float displacement = 0.1f;
 
     [SerializeField]
     SpaceTRS domain = new SpaceTRS { scale = 8f };
 
     NativeArray<uint> hashes;
 
-    NativeArray<float3> positions;
+    NativeArray<float3> positions, normals;
 
-    ComputeBuffer hashesBuffer, positionsBuffer;
+    ComputeBuffer hashesBuffer, positionsBuffer, normalsBuffer;
 
     MaterialPropertyBlock propertyBlock;
+
+    Bounds bounds;
 
     bool isDirty;
 
@@ -109,23 +148,29 @@ public class HashVisualisation : MonoBehaviour
         int length = resolution * resolution;
         hashes = new NativeArray<uint>(length, Allocator.Persistent);
         positions = new NativeArray<float3>(length, Allocator.Persistent);
+        normals = new NativeArray<float3>(length, Allocator.Persistent);
         hashesBuffer = new ComputeBuffer(length, 4);
         positionsBuffer = new ComputeBuffer(length, 3 * 4);
+        normalsBuffer = new ComputeBuffer(length, 3 * 4);
 
         propertyBlock ??= new MaterialPropertyBlock();
         propertyBlock.SetBuffer(hashesId, hashesBuffer);
         propertyBlock.SetBuffer(positionsId, positionsBuffer);
-        propertyBlock.SetVector(configId, new Vector4(resolution, 1f / resolution, verticalOffset / resolution));
+        propertyBlock.SetBuffer(normalsId, normalsBuffer);
+        propertyBlock.SetVector(configId, new Vector4(resolution, 1f / resolution, displacement / resolution));
     }
 
     private void OnDisable()
     {
         hashes.Dispose();
         positions.Dispose();
+        normals.Dispose();
         hashesBuffer.Release();
         positionsBuffer.Release();
+        normalsBuffer.Release();
         hashesBuffer = null;
         positionsBuffer = null;
+        normalsBuffer = null;
     }
 
     private void OnValidate()
@@ -144,8 +189,10 @@ public class HashVisualisation : MonoBehaviour
             isDirty = false;
             transform.hasChanged = false;
 
+            bounds = new Bounds(transform.position, float3(2f * cmax(abs(transform.lossyScale)) + displacement));
+
             JobHandle handle = Shapes.Job.ScheduleParallel(
-                positions, resolution, transform.localToWorldMatrix, default
+                positions, normals, resolution, transform.localToWorldMatrix, default
                 );
 
             new HashJob
@@ -158,10 +205,11 @@ public class HashVisualisation : MonoBehaviour
 
             hashesBuffer.SetData(hashes);
             positionsBuffer.SetData(positions);
+            normalsBuffer.SetData(normals);
         }
 
         Graphics.DrawMeshInstancedProcedural(
-            instanceMesh, 0, material, new Bounds(Vector3.zero, Vector3.one), hashes.Length, propertyBlock
+            instanceMesh, 0, material, bounds, hashes.Length, propertyBlock
         );
     }
 }
