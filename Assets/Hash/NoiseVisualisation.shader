@@ -1,4 +1,4 @@
-Shader "Hash/HashVisualisation"
+Shader "Hash/NoiseVisualisation"
 {
     SubShader
     {
@@ -8,7 +8,7 @@ Shader "Hash/HashVisualisation"
             #pragma editor_sync_compilation
             #pragma target 4.5
 
-            #include "HashGPU.hlsl"
+            #include "NoiseGPU.hlsl"
 
             struct Input
             {
@@ -17,7 +17,7 @@ Shader "Hash/HashVisualisation"
 
             void ConfigureSurface (Input input, inout SurfaceOutputStandard surface)
             {
-                surface.Albedo = GetHashColour().rgb;
+                surface.Albedo = GetNoiseColour().rgb;
             }
         ENDCG
     }
