@@ -140,6 +140,9 @@ public class HashVisualisation : MonoBehaviour
     [SerializeField]
     Shape shape;
 
+    [SerializeField, Range(0.1f, 10f)]
+    float instanceScale = 2f;
+
     NativeArray<uint4> hashes;
 
     NativeArray<float3x4> positions, normals;
@@ -177,7 +180,7 @@ public class HashVisualisation : MonoBehaviour
         propertyBlock.SetBuffer(hashesId, hashesBuffer);
         propertyBlock.SetBuffer(positionsId, positionsBuffer);
         propertyBlock.SetBuffer(normalsId, normalsBuffer);
-        propertyBlock.SetVector(configId, new Vector4(resolution, 1f / resolution, displacement));
+        propertyBlock.SetVector(configId, new Vector4(resolution, instanceScale / resolution, displacement));
     }
 
     private void OnDisable()
