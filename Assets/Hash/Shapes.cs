@@ -15,14 +15,14 @@ public static class Shapes
 
         public float resolution, invResolution;
 
-        public float3x4 positionTRS;
+        public float3x4 positionTRS, normalTRS;
 
         public void Execute(int i)
         {
             Point4 p = default(S).GetPoint4(i, resolution, invResolution);
 
             positions[i] = transpose(TransformVectors(positionTRS, p.positions));
-            float3x4 n = transpose(TransformVectors(positionTRS, p.normals));
+            float3x4 n = transpose(TransformVectors(normalTRS, p.normals));
             normals[i] = float3x4(
                 normalize(n.c0), normalize(n.c1), normalize(n.c2), normalize(n.c3)
             );
@@ -30,13 +30,16 @@ public static class Shapes
 
         public static JobHandle ScheduleParallel (NativeArray<float3x4> positions, NativeArray<float3x4> normals, int resolution, float4x4 trs, JobHandle dependency)
         {
+            float4x4 tim = transpose(inverse(trs));
+
             return new Job<S>
             {
                 positions = positions,
                 normals = normals,
                 resolution = resolution,
                 invResolution = 1f / resolution,
-                positionTRS = float3x4(trs.c0.xyz,trs.c1.xyz,trs.c2.xyz, trs.c3.xyz)
+                positionTRS = float3x4(trs.c0.xyz,trs.c1.xyz,trs.c2.xyz, trs.c3.xyz),
+                normalTRS = float3x4(tim.c0.xyz, tim.c1.xyz, tim.c2.xyz, tim.c3.xyz)
             }.ScheduleParallel(positions.Length, resolution, dependency);
         }
 

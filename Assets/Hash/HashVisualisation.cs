@@ -177,7 +177,7 @@ public class HashVisualisation : MonoBehaviour
         propertyBlock.SetBuffer(hashesId, hashesBuffer);
         propertyBlock.SetBuffer(positionsId, positionsBuffer);
         propertyBlock.SetBuffer(normalsId, normalsBuffer);
-        propertyBlock.SetVector(configId, new Vector4(resolution, 1f / resolution, displacement / resolution));
+        propertyBlock.SetVector(configId, new Vector4(resolution, 1f / resolution, displacement));
     }
 
     private void OnDisable()
