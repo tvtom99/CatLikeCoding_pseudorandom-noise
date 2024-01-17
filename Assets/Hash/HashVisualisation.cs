@@ -137,6 +137,9 @@ public class HashVisualisation : MonoBehaviour
     [SerializeField]
     SpaceTRS domain = new SpaceTRS { scale = 8f };
 
+    [SerializeField]
+    Shape shape;
+
     NativeArray<uint4> hashes;
 
     NativeArray<float3x4> positions, normals;
@@ -148,6 +151,14 @@ public class HashVisualisation : MonoBehaviour
     Bounds bounds;
 
     bool isDirty;
+
+    public enum Shape { Plane, Sphere, Torus }
+
+    static Shapes.ScheduleDelegate[] shapeJobs = {
+        Shapes.Job<Shapes.Plane>.ScheduleParallel,
+        Shapes.Job<Shapes.Sphere>.ScheduleParallel,
+        Shapes.Job<Shapes.Torus>.ScheduleParallel
+    };
 
     private void OnEnable()
     {
@@ -200,7 +211,7 @@ public class HashVisualisation : MonoBehaviour
 
             bounds = new Bounds(transform.position, float3(2f * cmax(abs(transform.lossyScale)) + displacement));
 
-            JobHandle handle = Shapes.Job<Shapes.Plane>.ScheduleParallel(
+            JobHandle handle = shapeJobs[(int)shape](
                 positions, normals, resolution, transform.localToWorldMatrix, default
                 );
 

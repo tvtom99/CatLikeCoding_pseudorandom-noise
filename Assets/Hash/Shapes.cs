@@ -47,6 +47,8 @@ public static class Shapes
 		);
     }
 
+    public delegate JobHandle ScheduleDelegate(NativeArray<float3x4> positions, NativeArray<float3x4> normals, int resolution, float4x4 trs, JobHandle dependency);
+
     public struct Point4
     {
         public float4x3 positions, normals;
@@ -55,6 +57,16 @@ public static class Shapes
     public interface IShape
     {
         Point4 GetPoint4(int i, float resolution, float invResolution);
+    }
+
+    public static float4x2 IndexTo4UV(int i, float resolution, float invResolution)
+    {
+        float4x2 uv;
+        float4 i4 = 4 * i + float4(0f, 1f, 2f, 3f);
+        uv.c1 = floor(invResolution * i4 + 0.00001f);
+        uv.c0 = invResolution * (i4 - resolution * uv.c1 + 0.5f);
+        uv.c1 = invResolution * (uv.c1 + 0.5f);
+        return uv;
     }
 
     public struct Plane : IShape
@@ -70,13 +82,44 @@ public static class Shapes
         }
     }
 
-    public static float4x2 IndexTo4UV(int i, float resolution, float invResolution)
+    public struct Sphere : IShape
     {
-        float4x2 uv;
-        float4 i4 = 4 * i + float4(0f, 1f, 2f, 3f);
-        uv.c1 = floor(invResolution * i4 + 0.00001f);
-        uv.c0 = invResolution * (i4 - resolution * uv.c1 + 0.5f);
-        uv.c1 = invResolution * (uv.c1 + 0.5f);
-        return uv;
+        public Point4 GetPoint4(int i, float resolution, float invResolution)
+        {
+            float4x2 uv = IndexTo4UV(i, resolution, invResolution);
+
+            float r = 0.5f;
+            float4 s = r * sin(PI * uv.c1);
+
+            Point4 p;
+            p.positions.c0 = s * sin(2f * PI * uv.c0);
+            p.positions.c1 = r * cos(PI * uv.c1);
+            p.positions.c2 = s * cos(2f * PI * uv.c0);
+            p.normals = p.positions;
+            return p;
+        }
+    }
+
+    public struct Torus : IShape
+    {
+
+        public Point4 GetPoint4(int i, float resolution, float invResolution)
+        {
+            float4x2 uv = IndexTo4UV(i, resolution, invResolution);
+
+            float r1 = 0.375f;
+            float r2 = 0.125f;
+            float4 s = r1 + r2 * cos(2f * PI * uv.c1);
+
+            Point4 p;
+            p.positions.c0 = s * sin(2f * PI * uv.c0);
+            p.positions.c1 = r2 * sin(2f * PI * uv.c1);
+            p.positions.c2 = s * cos(2f * PI * uv.c0);
+            p.normals = p.positions;
+            p.normals.c0 -= r1 * sin(2f * PI * uv.c0);
+            p.normals.c2 -= r1 * cos(2f * PI * uv.c0);
+
+            return p;
+        }
     }
 }
