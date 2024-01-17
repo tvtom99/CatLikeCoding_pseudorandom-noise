@@ -208,8 +208,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 611545584}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.093506776, y: -0.87844753, z: 0.19219677, w: 0.42737204}
-  m_LocalPosition: {x: 2.0936997, y: 1.0492665, z: 1.5291017}
+  m_LocalRotation: {x: 6.9167694e-16, y: -0.000000008439571, z: -0, w: 1}
+  m_LocalPosition: {x: -0.07186667, y: -0.16794795, z: -1.8730812}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -246,7 +246,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   instanceMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   material: {fileID: 2100000, guid: c4e55290a7683ff4d937cd4a766706fc, type: 2}
-  resolution: 16
+  resolution: 64
   displacement: 0.1
   shape: 0
   instanceScale: 2
@@ -273,7 +273,7 @@ Transform:
   m_GameObject: {fileID: 1306939502}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.4774323, y: -1.0367227, z: -1.2723743}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
