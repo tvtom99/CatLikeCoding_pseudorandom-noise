@@ -8,7 +8,7 @@ using static Unity.Mathematics.math;
 public static class Shapes
 {
     [BurstCompile(FloatPrecision.Standard, FloatMode.Fast, CompileSynchronously = true)]
-    public struct Job : IJobFor
+    public struct Job<S> : IJobFor where S : struct, IShape
     {
         [WriteOnly]
         NativeArray<float3x4> positions, normals;
@@ -19,7 +19,7 @@ public static class Shapes
 
         public void Execute(int i)
         {
-            Point4 p = default(Plane).GetPoint4(i, resolution, invResolution);
+            Point4 p = default(S).GetPoint4(i, resolution, invResolution);
 
             positions[i] = transpose(TransformVectors(positionTRS, p.positions));
             float3x4 n = transpose(TransformVectors(positionTRS, p.normals));
@@ -30,7 +30,7 @@ public static class Shapes
 
         public static JobHandle ScheduleParallel (NativeArray<float3x4> positions, NativeArray<float3x4> normals, int resolution, float4x4 trs, JobHandle dependency)
         {
-            return new Job
+            return new Job<S>
             {
                 positions = positions,
                 normals = normals,
