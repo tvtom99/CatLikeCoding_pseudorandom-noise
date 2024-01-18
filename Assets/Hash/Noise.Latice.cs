@@ -13,7 +13,11 @@ public static partial class Noise
         {
             LatticeSpan4 x = GetLatticeSpan4(positions.c0);
 
-            return lerp(hash.Eat(x.p0).Floats01A, hash.Eat(x.p1).Floats01A, x.t) * 2f - 1f;
+            Value g = default(Value);
+
+            return lerp(
+                g.Evaluate(hash.Eat(x.p0), x.g0), g.Evaluate(hash.Eat(x.p1), x.g1), x.t
+            );
         }
     }
 
@@ -65,6 +69,7 @@ public static partial class Noise
     struct LatticeSpan4
     {
         public int4 p0, p1;
+        public float4 g0, g1;
         public float4 t;
     }
 
@@ -74,6 +79,8 @@ public static partial class Noise
         LatticeSpan4 span;
         span.p0 = (int4)points;
         span.p1 = span.p0 + 1;
+        span.g0 = coordinates - span.p0;
+        span.g1 = span.g0 - 1f;
         span.t = coordinates - points;
         span.t = span.t * span.t * span.t * (span.t * (span.t * 6f - 15f) + 10f);
         return span;
