@@ -42,10 +42,10 @@ public static partial class Noise
                 (
                     g.Evaluate(h1.Eat(z.p0), x.g1, z.g0),
                     g.Evaluate(h1.Eat(z.p1), x.g1, z.g1),
-                    x.t
+                    z.t
                 ),
-                    x.t
-                );
+                x.t
+            );
         }
     }
 
