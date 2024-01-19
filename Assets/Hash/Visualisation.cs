@@ -94,6 +94,8 @@ public abstract class Visualisation : MonoBehaviour
         public float4 Floats01C => (float4)BytesC * (1f / 255f);
 
         public float4 Floats01D => (float4)BytesD * (1f / 255f);
+
+        public static SmallXXHash4 operator + (SmallXXHash4 h, int v) => h.accumulator + (uint)v;
     }
 
 

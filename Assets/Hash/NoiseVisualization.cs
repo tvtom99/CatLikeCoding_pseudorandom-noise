@@ -33,7 +33,7 @@ public class NoiseVisualzation: Visualisation
     int dimensions = 3;
 
     [SerializeField]
-    int seed;
+    Settings noiseSettings = Settings.Default;
 
     [SerializeField]
     SpaceTRS domain = new SpaceTRS { scale = 8f };
@@ -59,7 +59,7 @@ public class NoiseVisualzation: Visualisation
 
     protected override void UpdateVisualization(NativeArray<float3x4> positions, int resolution, JobHandle handle)
     {
-        noiseJobs[(int)type, dimensions - 1](positions, noise, seed, domain, resolution, handle).Complete();
+        noiseJobs[(int)type, dimensions - 1](positions, noise, noiseSettings, domain, resolution, handle).Complete();
 
         noiseBuffer.SetData(noise.Reinterpret<float>(4 * 4));
     }
