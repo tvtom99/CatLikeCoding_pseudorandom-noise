@@ -8,7 +8,7 @@ using static Noise;
 
 public class NoiseVisualzation: Visualisation
 {
-    public enum NoiseType { Perlin, PerlinTurbulence, Value, ValueTurbulence }
+    public enum NoiseType { Perlin, PerlinTurbulence, Value, ValueTurbulence, Voronoi }
 
     [SerializeField]
     NoiseType type;
@@ -48,6 +48,14 @@ public class NoiseVisualzation: Visualisation
             Job<Lattice2D<LatticeTiling, Turbulence <Value>>>.ScheduleParallel,
             Job<Lattice3D<LatticeNormal, Turbulence <Value>>>.ScheduleParallel,
             Job<Lattice3D<LatticeTiling, Turbulence <Value>>>.ScheduleParallel
+        },
+        {
+            Job<Voronoi1D<LatticeNormal>>.ScheduleParallel,
+            Job<Voronoi1D<LatticeTiling>>.ScheduleParallel,
+            Job<Voronoi2D<LatticeNormal>>.ScheduleParallel,
+            Job<Voronoi2D<LatticeTiling>>.ScheduleParallel,
+            Job<Voronoi3D<LatticeNormal>>.ScheduleParallel,
+            Job<Voronoi3D<LatticeTiling>>.ScheduleParallel
         }
     };
 
