@@ -15,10 +15,18 @@ public static partial class Noise
         [Range(1, 6)]
         public int octaves;
 
+        [Range(2, 4)]
+        public int lacunarity;
+
+        [Range(0f, 1f)]
+        public float persistence;
+
         public static Settings Default => new Settings 
         { 
             frequency = 4,
-            octaves = 1
+            octaves = 1,
+            lacunarity = 2,
+            persistence = 0.5f
         };
     }
 }

@@ -11,7 +11,7 @@ public static partial class Noise
 
     public interface INoise
     {
-        float4 GetNoise4(float4x3 positions, SmallXXHash4 hash);
+        float4 GetNoise4(float4x3 positions, SmallXXHash4 hash, int frequency);
     }
 
     [BurstCompile(FloatPrecision.Standard, FloatMode.Fast, CompileSynchronously = true)]
@@ -37,10 +37,10 @@ public static partial class Noise
 
             for(int ii = 0; ii < settings.octaves; ii++) 
             {
-                sum += amplitude * default(N).GetNoise4(frequency * position, hash + ii);
+                sum += amplitude * default(N).GetNoise4(position, hash + ii, frequency);
                 amplitudeSum += amplitude;
-                frequency *= 2;
-                amplitude *= 0.5f;
+                frequency *= settings.lacunarity;
+                amplitude *= settings.persistence;
             }
             noise[i] = sum / amplitudeSum;
         }
