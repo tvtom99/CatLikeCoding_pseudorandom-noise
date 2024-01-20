@@ -250,12 +250,15 @@ MonoBehaviour:
   displacement: 0.1
   shape: 0
   instanceScale: 2
-  type: 1
-  dimensions: 2
+  type: 4
+  dimensions: 1
+  tiling: 0
   noiseSettings:
     seed: 0
     frequency: 4
     octaves: 1
+    lacunarity: 2
+    persistence: 0.5
   domain:
     translation:
       x: 0
@@ -266,9 +269,9 @@ MonoBehaviour:
       y: 0
       z: 0
     scale:
-      x: 8
-      y: 8
-      z: 8
+      x: 1
+      y: 1
+      z: 1
 --- !u!4 &1306939504
 Transform:
   m_ObjectHideFlags: 0
