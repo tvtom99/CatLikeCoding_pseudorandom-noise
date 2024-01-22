@@ -16,4 +16,9 @@ public static partial class Noise
     {
         public float4 Evaluate(float4x2 distances) => distances.c1;
     }
+
+    public struct F2MinusF1 : IVoronoiFunction
+    {
+        public float4 Evaluate(float4x2 distaces) => distaces.c1 - distaces.c0;
+    }
 }
