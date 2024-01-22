@@ -8,7 +8,7 @@ using static Noise;
 
 public class NoiseVisualzation: Visualisation
 {
-    public enum NoiseType { Perlin, PerlinTurbulence, Value, ValueTurbulence, Voronoi }
+    public enum NoiseType { Perlin, PerlinTurbulence, Value, ValueTurbulence, VoronoiF1, VoronoiF2 }
 
     [SerializeField]
     NoiseType type;
@@ -50,12 +50,20 @@ public class NoiseVisualzation: Visualisation
             Job<Lattice3D<LatticeTiling, Turbulence <Value>>>.ScheduleParallel
         },
         {
-            Job<Voronoi1D<LatticeNormal>>.ScheduleParallel,
-            Job<Voronoi1D<LatticeTiling>>.ScheduleParallel,
-            Job<Voronoi2D<LatticeNormal>>.ScheduleParallel,
-            Job<Voronoi2D<LatticeTiling>>.ScheduleParallel,
-            Job<Voronoi3D<LatticeNormal>>.ScheduleParallel,
-            Job<Voronoi3D<LatticeTiling>>.ScheduleParallel
+            Job<Voronoi1D<LatticeNormal, F1>>.ScheduleParallel,
+            Job<Voronoi1D<LatticeTiling, F1>>.ScheduleParallel,
+            Job<Voronoi2D<LatticeNormal, F1>>.ScheduleParallel,
+            Job<Voronoi2D<LatticeTiling, F1>>.ScheduleParallel,
+            Job<Voronoi3D<LatticeNormal, F1>>.ScheduleParallel,
+            Job<Voronoi3D<LatticeTiling, F1>>.ScheduleParallel
+        },
+        {
+            Job<Voronoi1D<LatticeNormal, F2>>.ScheduleParallel,
+            Job<Voronoi1D<LatticeTiling, F2>>.ScheduleParallel,
+            Job<Voronoi2D<LatticeNormal, F2>>.ScheduleParallel,
+            Job<Voronoi2D<LatticeTiling, F2>>.ScheduleParallel,
+            Job<Voronoi3D<LatticeNormal, F2>>.ScheduleParallel,
+            Job<Voronoi3D<LatticeTiling, F2>>.ScheduleParallel
         }
     };
 
